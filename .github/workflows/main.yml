@@ -17,6 +17,7 @@ jobs:
           node-version: '18'
       - name: Install Dependencies
         run: |
+          cd frontend
           npm install
           npm run build
       - name: Package.json version increase
