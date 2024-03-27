@@ -19,7 +19,6 @@ jobs:
         run: |
           npm install
           npm run build
-	  yarn dev
       - name: Package.json version increase
         run: |
           git config --global user.name 'mdriyazali'
