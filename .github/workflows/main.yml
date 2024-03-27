@@ -28,7 +28,7 @@ jobs:
           npm version patch --no-git-tag-version
           git add package.json
           git commit -m "Increase version of package.json "
-          git push https://${{ secrets.WORKFLOW_TOKEN }}@github.com:mdriyazali/frontend.git
+          git push https://${{ secrets.WORKFLOW_TOKEN }}@github.com/mdriyazali/frontend.git
       - name: Push dist's files to S3 bucket
         run: |
           aws s3 cp ./dist/ s3://riyazali-s3-bucket/ --recursive
