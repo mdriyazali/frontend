@@ -22,6 +22,7 @@ jobs:
           npm run build
       - name: Package.json version increase
         run: |
+          cd frontend
           git config --global user.name 'mdriyazali'
           git config --global user.email 'mdriyazali254362@gmail.com'
           npm version patch --no-git-tag-version
