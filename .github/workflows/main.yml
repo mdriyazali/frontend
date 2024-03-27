@@ -14,12 +14,12 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '20'
+          node-version: '18'
       - name: Install Dependencies
         run: |
           npm install
           npm run build
-          yarn dev
+	  yarn dev
       - name: Package.json version increase
         run: |
           git config --global user.name 'mdriyazali'
