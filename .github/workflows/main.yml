@@ -31,7 +31,7 @@ jobs:
           git push https://${{ secrets.WORKFLOW_TOKEN }}@github.com/mdriyazali/frontend.git
       - name: Push dist's files to S3 bucket
         run: |
-          aws s3 cp /dist/ s3://riyazali-s3-bucket/ --recursive
+          aws s3 cp frontend/dist/ s3://riyazali-s3-bucket/ --recursive
 
       - name: Invalidate CloudFront Cache
         run: |
