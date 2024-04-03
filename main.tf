@@ -3,42 +3,38 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "presentation_bucket" {
-  bucket = "riyaz-front-bucket"
+  bucket = "riyaz-lf-bucket"
 }
 
 resource "aws_iam_role" "riyaz_role" {
-  name = "riyaz-front-role"
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
+  name = "riyaz-lf-role"
+  assume_role_policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "lambda.amazonaws.com"
+        },
+        "Action": "sts:AssumeRole"
+      }
+    ]
+  })
 }
 
 resource "aws_iam_policy" "s3_access_policy" {
   name        = "S3AccessPolicy"
   description = "Policy for S3 access"
-  policy      = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "s3:*",
-      "Resource": "*"
-    }
-  ]
-}
-EOF
+  policy      = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": "s3:*",
+        "Resource": "*"
+      }
+    ]
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "s3_access_attachment" {
@@ -49,13 +45,13 @@ resource "aws_iam_role_policy_attachment" "s3_access_attachment" {
 resource "aws_s3_bucket_policy" "bucket_policy" {
   bucket = aws_s3_bucket.presentation_bucket.bucket
   policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
+    "Version": "2012-10-17",
+    "Statement": [
       {
-        Effect   = "Allow",
-        Principal = "*",
-        Action   = "s3:GetObject",
-        Resource = aws_s3_bucket.presentation_bucket.arn
+        "Effect": "Allow",
+        "Principal": "*",
+        "Action": "s3:GetObject",
+        "Resource": aws_s3_bucket.presentation_bucket.arn
       }
     ]
   })
@@ -73,7 +69,7 @@ resource "null_resource" "sync_frontend_dist" {
   provisioner "local-exec" {
     command = <<-EOT
       cd frontend
-      aws s3 sync dist s3://riyaz-front-bucket/dist
+      aws s3 sync dist s3://riyaz-lf-bucket/dist
     EOT
   }
 }
@@ -85,4 +81,3 @@ output "bucket_name" {
 output "role_name" {
   value = aws_iam_role.riyaz_role.name
 }
-
