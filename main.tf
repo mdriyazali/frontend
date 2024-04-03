@@ -4,11 +4,11 @@ provider "aws" {
 
 resource "aws_s3_bucket" "presentation_bucket" {
   bucket = var.bucket_name
+}
 
-  # Enable versioning for the bucket
-  versioning {
-    enabled = true
-  }
+resource "aws_s3_bucket_versioning" "presentation_bucket_versioning" {
+  bucket = aws_s3_bucket.presentation_bucket.id
+  enabled = true
 }
 
 resource "aws_cloudfront_distribution" "presentation_distribution" {
@@ -49,7 +49,7 @@ resource "aws_cloudfront_distribution" "presentation_distribution" {
 
 # IAM Role
 resource "aws_iam_role" "riyaz_role" {
-  name               = "riyaz-tf-role"  # IAM role name
+  name               = "riyazzz-roole"  # Updated role name
   assume_role_policy = jsonencode({
     "Version": "2012-10-17",
     "Statement": [{
