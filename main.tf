@@ -6,11 +6,6 @@ resource "aws_s3_bucket" "presentation_bucket" {
   bucket = var.bucket_name
 }
 
-resource "aws_s3_bucket_versioning" "presentation_bucket_versioning" {
-  bucket = aws_s3_bucket.presentation_bucket.id
-  enabled = true
-}
-
 resource "aws_cloudfront_distribution" "presentation_distribution" {
   origin {
     domain_name = aws_s3_bucket.presentation_bucket.bucket_regional_domain_name
@@ -49,7 +44,7 @@ resource "aws_cloudfront_distribution" "presentation_distribution" {
 
 # IAM Role
 resource "aws_iam_role" "riyaz_role" {
-  name               = "riyazzz-roole"  # Updated role name
+  name               = "riyazzz-roole"
   assume_role_policy = jsonencode({
     "Version": "2012-10-17",
     "Statement": [{
@@ -63,7 +58,7 @@ resource "aws_iam_role" "riyaz_role" {
 }
 
 resource "aws_iam_policy" "s3_access_policy" {
-  name        = "S3AccessPolicyRiyazUnique"  # Unique IAM policy name
+  name        = "S3AccessPolicyRiyazUnique"
   description = "IAM policy for accessing S3 bucket"
   policy      = jsonencode({
     "Version": "2012-10-17",
@@ -74,7 +69,6 @@ resource "aws_iam_policy" "s3_access_policy" {
     }]
   })
 
-  # Ignore changes to avoid recreation if policy already exists
   lifecycle {
     ignore_changes = [policy]
   }
