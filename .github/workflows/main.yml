@@ -1,60 +1,42 @@
-name: CI/CD Workflow
+name: Frontend Build and Deploy to S3
 
 on:
-  pull_request:
-    branches:
-      - main
-    types: [opened, synchronize]
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
+    name: Build Dist
+    runs-on: self-hosted
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '14'
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
 
-    - name: Install dependencies
-      run: npm install # Or whatever command to install dependencies
+      - name: Install Dependencies and Build
+        run: |
+          cd frontend
+          npm install
+          npm run build
 
-    - name: Build
-      run: npm run build # Or your build command
+      - name: Package.json version increase
+        run: |
+          cd frontend
+          git config --global user.name 'mdriyazali'
+          git config --global user.email 'mdriyazali254362@gmail.com'
+          npm version patch --no-git-tag-version
+          git add package.json
+          git commit -m "Increase version of package.json "
+          git push https://${{ secrets.WORKFLOW_TOKEN }}@github.com/mdriyazali/frontend.git
 
-    - name: Terraform Init
-      uses: hashicorp/setup-terraform@v1
-      with:
-        terraform_version: '1.0.0'
+      - name: Push dist's files to S3 bucket
+        run: |
+          aws s3 cp frontend/dist/ s3://riyazali-s3-bucket/ --recursive
 
-    - name: Terraform Plan
-      run: terraform plan
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-    - name: Terraform Apply
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      run: terraform apply -auto-approve
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-    - name: Tag and Release
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          # List your artifact files here
-        tag_name: v${{ github.run_number }}
-        title: Release v${{ github.run_number }}
-        body: |
-          Release description here.
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Invalidate CloudFront Cache
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
