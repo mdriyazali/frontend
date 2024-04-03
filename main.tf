@@ -3,58 +3,8 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "presentation_bucket" {
-  bucket = "riyaz-khan-lf"
-}
-
-resource "aws_iam_role" "riyaz_role" {
-  name = "riyaz-khan-role"
-  assume_role_policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Effect": "Allow",
-        "Principal": {
-          "Service": "lambda.amazonaws.com"
-        },
-        "Action": "sts:AssumeRole"
-      }
-    ]
-  })
-}
-
-resource "aws_iam_policy" "s3_access_policy" {
-  name        = "S3AccessPolicy"
-  description = "Policy for S3 access"
-  policy      = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Effect": "Allow",
-        "Action": "s3:*",
-        "Resource": "*"
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "s3_access_attachment" {
-  role       = aws_iam_role.riyaz_role.name
-  policy_arn = aws_iam_policy.s3_access_policy.arn
-}
-
-resource "aws_s3_bucket_policy" "bucket_policy" {
-  bucket = aws_s3_bucket.presentation_bucket.bucket
-  policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Effect": "Allow",
-        "Principal": "*",
-        "Action": "s3:GetObject",
-        "Resource": aws_s3_bucket.presentation_bucket.arn
-      }
-    ]
-  })
+  bucket = "riyaz-lf-tf-bucket"
+  acl    = "private"
 }
 
 resource "aws_s3_bucket_versioning" "presentation_bucket_versioning" {
@@ -65,19 +15,28 @@ resource "aws_s3_bucket_versioning" "presentation_bucket_versioning" {
   }
 }
 
+resource "aws_iam_role" "riyaz_role" {
+  name               = "riyaz-lf-tf-role"
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "lambda.amazonaws.com"
+        },
+        "Action" : "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
 resource "null_resource" "sync_frontend_dist" {
-  provisioner "local-exec" {
-    command = <<-EOT
-      cd frontend
-      aws s3 sync dist s3://riyaz-khan-lf/dist
-    EOT
+  triggers = {
+    always_run = timestamp()
   }
-}
 
-output "bucket_name" {
-  value = aws_s3_bucket.presentation_bucket.bucket
-}
-
-output "role_name" {
-  value = aws_iam_role.riyaz_role.name
+  provisioner "local-exec" {
+    command = "cd frontend && aws s3 sync dist s3://riyaz-lf-tf-bucket/dist"
+  }
 }
