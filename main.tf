@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "presentation_bucket" {
-  bucket = "riyaz-lf-tf-bucket"
+  bucket = "riyaz-dist-bucket"
   acl    = "private"
 }
 
@@ -16,7 +16,7 @@ resource "aws_s3_bucket_versioning" "presentation_bucket_versioning" {
 }
 
 resource "aws_iam_role" "riyaz_role" {
-  name               = "riyaz-lf-tf-role"
+  name               = "riyaz-dist-role"
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -37,6 +37,6 @@ resource "null_resource" "sync_frontend_dist" {
   }
 
   provisioner "local-exec" {
-    command = "cd frontend && aws s3 sync dist s3://riyaz-lf-tf-bucket/dist"
+    command = "cd frontend && aws s3 sync dist s3://riyaz-dist-bucket/dist --region us-east-1"
   }
 }
