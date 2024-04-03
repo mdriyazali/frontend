@@ -1,4 +1,4 @@
-name: Terraform CI/CD
+name: CI/CD Pipeline
 
 on:
   push:
@@ -28,7 +28,7 @@ jobs:
         run: terraform plan
 
       - name: Semantic Release
-        uses: semantic-release/semantic-release@v16
+        uses: semantic-release/semantic-release@v17
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
