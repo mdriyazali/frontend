@@ -11,14 +11,6 @@ resource "aws_s3_bucket" "presentation_bucket" {
   }
 }
 
-resource "aws_s3_bucket_versioning" "presentation_bucket_versioning" {
-  bucket = aws_s3_bucket.presentation_bucket.id
-
-  versioning_configuration {
-    enabled = true
-  }
-}
-
 # IAM Role
 resource "aws_iam_role" "riyaz_role" {
   name               = var.role_name
