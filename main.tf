@@ -1,18 +1,9 @@
 provider "aws" {
-  region = "us-east-1"  
-}
-
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 3.0"
-    }
-  }
+  region = var.region
 }
 
 resource "aws_s3_bucket" "presentation_bucket" {
-  bucket = "riyazgit-presentation-bucket"  
+  bucket = var.bucket_name
 
   # Enable versioning for the bucket
   versioning {
@@ -26,7 +17,7 @@ resource "aws_cloudfront_distribution" "presentation_distribution" {
     origin_id   = "S3-${aws_s3_bucket.presentation_bucket.id}"
   }
 
-  enabled             = true
+  enabled             = var.distribution_enabled
   is_ipv6_enabled     = true
   default_root_object = "index.html"
 
