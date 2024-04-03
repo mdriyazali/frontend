@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "presentation_bucket" {
-  bucket = "riyazkhan-git-bucket"
+  bucket = "riyaz-git-tf-bucket"
 }
 
 resource "aws_s3_bucket_versioning" "presentation_bucket_versioning" {
@@ -52,7 +52,7 @@ resource "aws_cloudfront_distribution" "presentation_distribution" {
 
 # IAM Role
 resource "aws_iam_role" "riyaz_role" {
-  name               = "riyazkhan-git-role"
+  name               = "riyaz-tf-role"
   assume_role_policy = jsonencode({
     "Version": "2012-10-17",
     "Statement": [{
