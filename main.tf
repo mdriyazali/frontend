@@ -1,16 +1,13 @@
 provider "aws" {
-  region = "us-east-1"
+  region = var.region
 }
 
 resource "aws_s3_bucket" "presentation_bucket" {
-  bucket = "riyaz-git-tf-bucket"
-}
+  bucket = var.bucket_name
 
-resource "aws_s3_bucket_versioning" "presentation_bucket_versioning" {
-  bucket = aws_s3_bucket.presentation_bucket.id
-
-  versioning_configuration {
-    status = "Enabled"
+  # Enable versioning for the bucket
+  versioning {
+    enabled = true
   }
 }
 
@@ -52,7 +49,7 @@ resource "aws_cloudfront_distribution" "presentation_distribution" {
 
 # IAM Role
 resource "aws_iam_role" "riyaz_role" {
-  name               = "riyaz-tf-role"
+  name               = "riyaz-tf-role"  # IAM role name
   assume_role_policy = jsonencode({
     "Version": "2012-10-17",
     "Statement": [{
@@ -66,7 +63,7 @@ resource "aws_iam_role" "riyaz_role" {
 }
 
 resource "aws_iam_policy" "s3_access_policy" {
-  name        = "S3AccessPolicy"
+  name        = "S3AccessPolicyRiyazUnique"  # Unique IAM policy name
   description = "IAM policy for accessing S3 bucket"
   policy      = jsonencode({
     "Version": "2012-10-17",
@@ -93,10 +90,7 @@ resource "null_resource" "sync_frontend_dist" {
   provisioner "local-exec" {
     command = <<EOF
       cd frontend
-      aws s3 sync dist s3://${aws_s3_bucket.presentation_bucket.bucket}/dist --region=us-east-1
+      aws s3 sync frontend/dist s3://${aws_s3_bucket.presentation_bucket.bucket}/dist
     EOF
   }
-
-  # Ensure the local-exec runs only after the S3 bucket is created
-  depends_on = [aws_s3_bucket.presentation_bucket]
 }
