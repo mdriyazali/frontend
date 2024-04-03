@@ -28,7 +28,7 @@ jobs:
         run: terraform plan
 
       - name: Semantic Release
-        uses: semantic-release/semantic-release@v17
+        uses: semantic-release/semantic-release@v16
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
