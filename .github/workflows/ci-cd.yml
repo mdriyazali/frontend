@@ -31,30 +31,27 @@ jobs:
           echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> $GITHUB_ENV
           echo "AWS_REGION=$AWS_REGION" >> $GITHUB_ENV
 
-      - name: Initialize Terraform
+      - name: Terraform Init
         run: terraform init
 
-      - name: Install dependencies
+      - name: Terraform Plan
+        run: terraform plan
+
+      - name: Build and Deploy Frontend
         run: |
           cd frontend
           npm install
-
-      - name: Terraform dry run (Terraform plan)
-        run: terraform plan
-
-      - name: Build artifact
-        run: |
-          cd frontend
           npm run build
+          cd ..
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
 
       - name: Bump version
         run: |
-          git config user.name "Automated CI/CD"
-          git config user.email "ci-cd@example.com"
+          cd frontend
           npm version patch --no-git-tag-version
-
-      - name: Terraform apply
-        run: terraform apply -auto-approve
+          cd ..
 
       - name: Create Git tag
         run: git tag -a v${{ env.npm_package_version }} -m "Version ${{ env.npm_package_version }}"
