@@ -31,6 +31,9 @@ jobs:
           echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> $GITHUB_ENV
           echo "AWS_REGION=$AWS_REGION" >> $GITHUB_ENV
 
+      - name: Initialize Terraform
+        run: terraform init
+
       - name: Install dependencies
         run: |
           cd frontend
