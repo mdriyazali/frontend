@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "frontend_bucket" {
-  bucket = "riyaz-new" # Change to your bucket name
+  bucket = "riyaz-name" # Change to your bucket name
   acl    = "public-read"      # Adjust permissions as needed
 
   website {
