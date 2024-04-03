@@ -7,13 +7,13 @@ variable "region" {
 variable "bucket_name" {
   description = "S3 bucket name"
   type        = string
-  default     = "riyazkhanali-bucket"
+  default     = "riyazkhannn-bucket"
 }
 
 variable "role_name" {
   description = "IAM role name"
   type        = string
-  default     = "riyazkhanali-role"
+  default     = "riyazkhannn-role"
 }
 
 variable "distribution_enabled" {
