@@ -1,13 +1,14 @@
 provider "aws" {
-  region = "us-east-1" # Change to your desired region
+  region = "us-east-1"  # Change to your desired region
 }
 
 resource "aws_s3_bucket" "frontend_bucket" {
-  bucket = "riyaz-name" # Change to your bucket name
-  acl    = "public-read"      # Adjust permissions as needed
+  bucket = "riyazali-s3-bucket"  # Change to your bucket name
+  acl    = "public-read"         # Adjust permissions as needed
 
   website {
     index_document = "index.html"
+    error_document = "index.html"  # You can change this if needed
   }
 }
 
