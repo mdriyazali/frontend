@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "presentation_bucket" {
-  bucket = riyazgit.bucket_name
+  bucket = var.bucket_name
 }
 
 resource "aws_s3_bucket_versioning" "presentation_bucket_versioning" {
