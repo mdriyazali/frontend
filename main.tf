@@ -3,11 +3,11 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "presentation_bucket" {
-  bucket = "riyaz-lf-bucket"
+  bucket = "riyaz-khan-lf"
 }
 
 resource "aws_iam_role" "riyaz_role" {
-  name = "riyaz-lf-role"
+  name = "riyaz-khan-role"
   assume_role_policy = jsonencode({
     "Version": "2012-10-17",
     "Statement": [
@@ -61,7 +61,7 @@ resource "aws_s3_bucket_versioning" "presentation_bucket_versioning" {
   bucket = aws_s3_bucket.presentation_bucket.bucket
 
   versioning_configuration {
-    enabled = true
+    status = "Enabled"
   }
 }
 
@@ -69,7 +69,7 @@ resource "null_resource" "sync_frontend_dist" {
   provisioner "local-exec" {
     command = <<-EOT
       cd frontend
-      aws s3 sync dist s3://riyaz-lf-bucket/dist
+      aws s3 sync dist s3://riyaz-khan-lf/dist
     EOT
   }
 }
