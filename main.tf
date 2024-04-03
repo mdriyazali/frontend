@@ -4,11 +4,20 @@ provider "aws" {
 
 resource "aws_s3_bucket" "presentation_bucket" {
   bucket = var.bucket_name
+
+  # Enable versioning for the bucket
+  versioning {
+    enabled = true
+  }
 }
 
 resource "aws_s3_bucket_versioning" "presentation_bucket_versioning" {
   bucket = aws_s3_bucket.presentation_bucket.id
-  enabled = true
+
+  # At least one versioning configuration block is required
+  versioning_configuration {
+    status = "Enabled"
+  }
 }
 
 resource "aws_cloudfront_distribution" "presentation_distribution" {
