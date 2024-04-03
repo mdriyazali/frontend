@@ -1,9 +1,9 @@
 provider "aws" {
-  region = var.region
+  region = "us-east-1"
 }
 
 resource "aws_s3_bucket" "presentation_bucket" {
-  bucket = var.bucket_name
+  bucket = "riyazkhan-git-bucket"
 }
 
 resource "aws_s3_bucket_versioning" "presentation_bucket_versioning" {
@@ -52,7 +52,7 @@ resource "aws_cloudfront_distribution" "presentation_distribution" {
 
 # IAM Role
 resource "aws_iam_role" "riyaz_role" {
-  name               = "riyaz-role"
+  name               = "riyazkhan-git-role"
   assume_role_policy = jsonencode({
     "Version": "2012-10-17",
     "Statement": [{
@@ -93,7 +93,7 @@ resource "null_resource" "sync_frontend_dist" {
   provisioner "local-exec" {
     command = <<EOF
       cd frontend
-      aws s3 sync dist s3://${aws_s3_bucket.presentation_bucket.bucket}/dist --region=${var.region}
+      aws s3 sync dist s3://${aws_s3_bucket.presentation_bucket.bucket}/dist --region=us-east-1
     EOF
   }
 
