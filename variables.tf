@@ -7,7 +7,7 @@ variable "region" {
 variable "bucket_name" {
   description = "S3 bucket name"
   type        = string
-  default     = "riyazgit-presentation-bucket"
+  default     = "riyazgit-bucket"
 }
 
 variable "distribution_enabled" {
