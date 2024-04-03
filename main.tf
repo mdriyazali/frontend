@@ -4,47 +4,24 @@ provider "aws" {
 
 resource "aws_s3_bucket" "presentation_bucket" {
   bucket = var.bucket_name
+
+  # Enable versioning for the bucket
+  versioning {
+    enabled = true
+  }
 }
 
-resource "aws_cloudfront_distribution" "presentation_distribution" {
-  origin {
-    domain_name = aws_s3_bucket.presentation_bucket.bucket_regional_domain_name
-    origin_id   = "S3-${aws_s3_bucket.presentation_bucket.id}"
-  }
+resource "aws_s3_bucket_versioning" "presentation_bucket_versioning" {
+  bucket = aws_s3_bucket.presentation_bucket.id
 
-  enabled             = var.distribution_enabled
-  is_ipv6_enabled     = true
-  default_root_object = "index.html"
-
-  default_cache_behavior {
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD", "OPTIONS"]
-    target_origin_id = "S3-${aws_s3_bucket.presentation_bucket.id}"
-
-    forwarded_values {
-      query_string = false
-      cookies {
-        forward = "none"
-      }
-    }
-
-    viewer_protocol_policy = "redirect-to-https"
-  }
-
-  restrictions {
-    geo_restriction {
-      restriction_type = "none"
-    }
-  }
-
-  viewer_certificate {
-    cloudfront_default_certificate = true
+  versioning_configuration {
+    enabled = true
   }
 }
 
 # IAM Role
 resource "aws_iam_role" "riyaz_role" {
-  name               = "riyazzz-roole"
+  name               = var.role_name
   assume_role_policy = jsonencode({
     "Version": "2012-10-17",
     "Statement": [{
@@ -58,7 +35,7 @@ resource "aws_iam_role" "riyaz_role" {
 }
 
 resource "aws_iam_policy" "s3_access_policy" {
-  name        = "S3AccessPolicyRiyazUnique"
+  name        = "S3AccessPolicy"
   description = "IAM policy for accessing S3 bucket"
   policy      = jsonencode({
     "Version": "2012-10-17",
@@ -68,10 +45,6 @@ resource "aws_iam_policy" "s3_access_policy" {
       "Resource": "${aws_s3_bucket.presentation_bucket.arn}/*"
     }]
   })
-
-  lifecycle {
-    ignore_changes = [policy]
-  }
 }
 
 resource "aws_iam_role_policy_attachment" "attach_s3_access_policy" {
