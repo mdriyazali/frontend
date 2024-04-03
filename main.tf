@@ -4,17 +4,11 @@ provider "aws" {
 
 resource "aws_s3_bucket" "presentation_bucket" {
   bucket = var.bucket_name
-
-  # Enable versioning for the bucket
-  versioning {
-    enabled = true
-  }
 }
 
 resource "aws_s3_bucket_versioning" "presentation_bucket_versioning" {
   bucket = aws_s3_bucket.presentation_bucket.id
 
-  # At least one versioning configuration block is required
   versioning_configuration {
     status = "Enabled"
   }
@@ -82,6 +76,11 @@ resource "aws_iam_policy" "s3_access_policy" {
       "Resource": "${aws_s3_bucket.presentation_bucket.arn}/*"
     }]
   })
+
+  # Ignore changes to avoid recreation if policy already exists
+  lifecycle {
+    ignore_changes = [policy]
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "attach_s3_access_policy" {
@@ -94,7 +93,10 @@ resource "null_resource" "sync_frontend_dist" {
   provisioner "local-exec" {
     command = <<EOF
       cd frontend
-      aws s3 sync frontend/dist s3://${aws_s3_bucket.presentation_bucket.bucket}/dist
+      aws s3 sync dist s3://${aws_s3_bucket.presentation_bucket.bucket}/dist --region=${var.region}
     EOF
   }
+
+  # Ensure the local-exec runs only after the S3 bucket is created
+  depends_on = [aws_s3_bucket.presentation_bucket]
 }
