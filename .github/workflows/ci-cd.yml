@@ -1,0 +1,73 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Configure AWS credentials
+        run: |
+          echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> $GITHUB_ENV
+          echo "AWS_REGION=$AWS_REGION" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm install
+
+      - name: Terraform dry run (Terraform plan)
+        run: terraform plan
+
+      - name: Build artifact
+        run: |
+          cd frontend
+          npm run build
+
+      - name: Bump version
+        run: |
+          git config user.name "Automated CI/CD"
+          git config user.email "ci-cd@example.com"
+          npm version patch --no-git-tag-version
+
+      - name: Terraform apply
+        run: terraform apply -auto-approve
+
+      - name: Create Git tag
+        run: git tag -a v${{ env.npm_package_version }} -m "Version ${{ env.npm_package_version }}"
+        if: github.ref == 'refs/heads/main'
+
+      - name: Push Git tag
+        run: git push origin v${{ env.npm_package_version }}
+        if: github.ref == 'refs/heads/main'
+
+      - name: Create GitHub release
+        uses: actions/create-release@v1
+        if: github.ref == 'refs/heads/main'
+        with:
+          tag_name: v${{ env.npm_package_version }}
+          release_name: Release ${{ env.npm_package_version }}
+          body: |
+            Release ${{ env.npm_package_version }}
+          draft: false
+          prerelease: false
