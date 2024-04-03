@@ -3,17 +3,20 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "presentation_bucket" {
-  bucket = "riyaz-intern-bucket"
+  bucket = "riyaz-tf-buckett"
 }
 
 resource "aws_s3_bucket_versioning" "presentation_bucket_versioning" {
-  bucket    = aws_s3_bucket.presentation_bucket.bucket
-  enabled   = true
+  bucket = aws_s3_bucket.presentation_bucket.bucket
+
+  versioning_configuration {
+    status = "Enabled"
+  }
 }
 
 # IAM Role
 resource "aws_iam_role" "riyaz_role" {
-  name               = "riyaz-intern-role"
+  name               = "riyaz-tf-rolee"
   assume_role_policy = jsonencode({
     "Version": "2012-10-17",
     "Statement": [{
