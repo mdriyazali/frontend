@@ -100,7 +100,7 @@ const Create = () => {
             </style>
             <div className="create-container">
                 <div className="d-flex justify-content-center">
-                    <h2>Add Todos</h2>
+                    <h2>Add Todo</h2>
                 </div>
                 <form onSubmit={handleSubmit}>
                     <div className="mb-3">
