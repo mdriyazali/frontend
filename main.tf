@@ -1,17 +1,36 @@
 provider "aws" {
-  region = "us-east-1"  # Change to your desired region
+  region = var.region
 }
 
-resource "aws_s3_bucket" "frontend_bucket" {
-  bucket = "riyazali-s3-bucket"  # Change to your bucket name
-  acl    = "public-read"         # Adjust permissions as needed
-
-  website {
-    index_document = "index.html"
-    error_document = "index.html"  # You can change this if needed
+terraform {
+  backend "s3" {
+    bucket         = "riyaz_khan-s3-tf-state"
+    key            = "terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "riyaz-tf-lockfile"
   }
 }
 
-output "bucket_domain_name" {
-  value = aws_s3_bucket.frontend_bucket.website_endpoint
+locals {
+  bucket_name = "${var.s3_dist_bucket}-${terraform.workspace}"
+}
+
+resource "aws_s3_bucket" "frontend_dist" {
+  bucket = local.bucket_name
+}
+
+resource "aws_s3_bucket_versioning" "frontend_dist_versioning" {
+  bucket = aws_s3_bucket.frontend_dist.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "frontend_dist_encryption" {
+  bucket = aws_s3_bucket.frontend_dist.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "aws:kms"
+    }
+  }
 }
