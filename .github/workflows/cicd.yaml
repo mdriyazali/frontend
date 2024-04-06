@@ -107,7 +107,7 @@ jobs:
 
       - name: Upload S3
         run: |
-          aws s3 cp frontend/dist s3://riyaz-s3-frontend-bucket-${{ needs.resolve-environment.outputs.env_name }} --recursive
+          aws s3 cp frontend/dist s3://riyaz-khan-s3-frontend-bucket-${{ needs.resolve-environment.outputs.env_name }} --recursive
 
       - name: Setup semver bash
         run: |
